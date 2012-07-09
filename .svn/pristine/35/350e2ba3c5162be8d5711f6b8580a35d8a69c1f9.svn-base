@@ -1,0 +1,170 @@
+package com.anjuke.android.haozu.test;
+
+import java.util.ArrayList;
+
+import com.anjuke.android.haozu.R;
+import com.anjuke.android.haozu.activity.WelcomeActivity;
+import com.anjuke.android.haozu.function.Action;
+import com.anjuke.android.util.Report;
+import com.jayway.android.robotium.solo.Solo;
+
+import android.test.ActivityInstrumentationTestCase2;
+import android.view.View;
+import android.widget.ListView;
+import android.widget.TextView;
+
+public class SearchConditionTest extends ActivityInstrumentationTestCase2<WelcomeActivity> {
+	private Solo solo;
+	private String imag = "";
+	private int count = 3;
+	private boolean flag =false;
+	private String testName = "好租找房条件检查";
+
+	public SearchConditionTest() {
+		super("com.anjuke.haozu", WelcomeActivity.class);
+	}
+
+	public void setUp() throws Exception {
+		solo = new Solo(getInstrumentation(), getActivity());
+	}
+
+	@Override
+	public void tearDown() throws Exception {
+		solo.finishOpenedActivities();
+	}
+	
+	public void testSearchTips() throws InterruptedException{
+		try{
+		Report.setTCNameLog(testName);
+		//设置一些信息用于比较，避免比较无用数据
+		Action.pathLineMemu(solo, 2);
+		Action.clickById(solo, R.id.activity_search_address_city,"切换城市");
+		Action.clickOnText(solo, "成都", "成都");
+		Action.pathLineMemu(solo, 2);
+//		Thread.sleep(2000);
+//		Action.wait(solo,R.id.activity_search_address_quick_block , count, "区域板块");
+//		Action.clickById(solo,R.id.activity_search_address_quick_block, "区域板块");
+		Action.clickOnText(solo, "按区域板块", "区域板块");
+		String title1=((TextView)solo.getView(R.id.activity_search_address_grade1_title)).getText().toString();
+		ArrayList<View> list1 = solo.getViews(solo.getView(R.id.activity_search_address_grade1_lv));
+		int m=0;
+		String address1=((TextView)list1.get(10)).getText().toString();
+		Action.clickOnView(solo,list1.get(10) ,address1);
+//		String title2=((TextView)solo.getView(R.id.activity_search_address_grade1_title)).getText().toString();
+//		if(title1.equals(title2)&& m<10){
+//			Thread.sleep(200);
+//			System.out.println("---->wait1");
+//			title2=((TextView)solo.getView(R.id.activity_search_address_grade1_title)).getText().toString();
+//			m++;
+//		}
+//		if(m>=10){
+//			Report.writeHTMLLog("选择城市失败", "脚本停止", "FAIL",
+//					imag);
+//			Report.seleniumReport();
+//			return;
+//		}
+
+		ArrayList<View> list2= solo.getViews(solo.getView(R.id.activity_search_address_grade1_lv));
+		while(((TextView)solo.getView(R.id.activity_search_address_grade1_title)).getText().toString()==title1)
+		{
+			Thread.sleep(200);
+			System.out.println("------>wait");
+			list2= solo.getViews(solo.getView(R.id.activity_search_address_grade1_lv));
+		}
+		while(list2.size()<11){
+			Thread.sleep(200);
+			System.out.println("------>wait1");
+			list2= solo.getViews(solo.getView(R.id.activity_search_address_grade1_lv));
+		}
+		while(((TextView)list1.get(10)).getText().equals(((TextView)list2.get(10)).getText())){
+			Thread.sleep(200);
+			solo.scrollUp();
+			System.out.println("------>wait2");
+			list2= solo.getViews(solo.getView(R.id.activity_search_address_grade1_lv));
+			}
+			solo.scrollUp();
+		
+		String address2=((TextView)list2.get(10)).getText().toString();
+		Action.clickOnView(solo,list2.get(10),address2);
+		
+		//由于左右滑动的RadioGroup点不到看不见的，所以重置一下，然后用clickInFilter()按顺序点击到需要的控件
+		Action.pathLineMemu(solo, 3);
+		Action.clickById(solo, R.id.activity_find_room_filter_v2_reset,"重置");
+		Action.clickInFilter(solo, 4, "租金");
+		Action.clickInFilter(solo, 3, "户型");
+		Action.clickInFilter(solo, 2, "来源");
+		Action.clickInFilter(solo, 3, "方式");
+		Action.clickById(solo, R.id.activity_find_room_filter_v2_back, "确定");
+		
+		//获取筛选信息栏内容
+		String searchTip = (String) ((TextView) solo.getView(R.id.activity_list_v2_searchtip)).getText();
+		Report.writeHTMLLog("获取筛选信息栏", "首页筛选条件为：" + searchTip,"DONE", "");
+		//获取标题栏地址并点击
+		String titleAddress = ((TextView)solo.getView(R.id.activity_list_v2_address)).getText().toString();
+		Report.writeHTMLLog("获取标题", "标题地址为：" + titleAddress,"DONE","");
+		Action.assertFilter(solo, "搜索条件和标题栏", titleAddress, address1,address2);
+		Action.clickById(solo, R.id.activity_list_v2_address,titleAddress);
+		//获取找房条件地址
+		String address =((TextView)solo.getView(R.id.activity_find_room_conditions_v2_address)).getText().toString();
+		Report.writeHTMLLog("获取找房条件", "找房条件地址：" + address,"DONE", "");
+		//获取找房条件
+		String searchConditon = ((TextView)solo.getView(R.id.activity_find_room_conditions_v2_filter)).getText().toString();
+		Report.writeHTMLLog("获取找房条件", "找房筛选条件：" + searchConditon,"DONE", "");
+		//替换筛选条件中间"|"为空格，方便和筛选信息栏比较
+		String replace=searchConditon.replace("|"," ");
+		System.out.println("searchConditon------>"+replace);
+		Action.assertString(solo, "保存前找房条件和筛选信息栏", titleAddress+searchTip,address+replace);
+		//获取找房条件列表
+		ArrayList<View> list = solo.getViews(solo.getView(R.id.activity_find_room_conditions_v2_list));
+		//保存找房条件
+		Action.clickById(solo, R.id.activity_find_room_conditions_v2_save, "保存");
+		System.out.println("size--->"+list.size());
+		//如果保存成功，当前找房条件与找房条件列表第一个找房条件进行比较
+		if(solo.searchText("保存成功")){
+			list = solo.getViews(solo.getView(R.id.activity_find_room_conditions_v2_list));
+			Action.assertString(solo, "找房条件", address+searchConditon, ((TextView)list.get(2)).getText().toString()+((TextView)list.get(3)).getText().toString());
+		}else{//保存失败，判断是否是存在的条件
+			
+			if(list.size()>=5){
+				System.out.println("---->");
+				solo.scrollUp();
+				System.out.println("拉到顶部---->");
+				int n=0;
+				for(View f:list){
+					System.out.println(n+"------>"+f.toString());
+					if(f instanceof TextView){
+						System.out.println(n+"----->"+((TextView)f).getText());
+					}
+					n++;
+				}
+				boolean result=false; 
+				String str="";
+				System.out.println("listsize---->"+list.size());
+				for(int i=2;i<list.size()&&result==false;i=i+3){
+					str=((TextView)list.get(i)).getText().toString();
+					result = address.equals(str);
+					System.out.println("str---->"+str);
+					System.out.println("result1---->"+result);
+					result = result && searchConditon.equals(((TextView)list.get(++i)).getText().toString());
+					System.out.println("result2---->"+result);
+				
+					if(result){
+						Report.writeHTMLLog("保存", "匹配到找房条件，找房条件已存在 ,value="+address+searchConditon, "PASS", Action.screenShot(solo));
+					}
+				}
+				if(result==false){
+					Report.writeHTMLLog("保存", "保存失败", "FAIL", Action.screenShot(solo));
+				}
+			}else{
+				Report.writeHTMLLog("保存", "保存失败", "FAIL", Action.screenShot(solo));
+			}
+		}
+		Action.goHomePage(solo);
+		Report.seleniumReport();
+		}catch(Exception e){
+			Report.writeHTMLLog("出现不可知异常:" + e.getMessage(), "脚本停止", "WARNING",
+					imag);
+			Report.seleniumReport();
+		}
+	}
+}

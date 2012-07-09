@@ -1,0 +1,85 @@
+package com.anjuke.android.haozu.test;
+
+
+import com.anjuke.android.haozu.activity.WelcomeActivity;
+import com.anjuke.android.haozu.function.Action;
+import com.jayway.android.robotium.solo.Solo;
+import com.anjuke.android.haozu.R;
+import com.anjuke.android.util.Report;
+import com.anjuke.android.util.ScreenShot;
+
+
+import android.test.ActivityInstrumentationTestCase2;
+
+import android.widget.TextView;
+
+public class MyFavTitleTest extends
+		ActivityInstrumentationTestCase2<WelcomeActivity> {
+	private Solo solo;
+	private String imag = "";
+	private int count = 3;
+	private boolean flag = false;
+	private String testName = "好租房源列表第一套房源与我的收藏列表第一套房源比较";
+
+	public MyFavTitleTest() {
+		super("com.anjuke.haozu", WelcomeActivity.class);
+	}
+
+	public void setUp() throws Exception {
+		solo = new Solo(getInstrumentation(), getActivity());
+	}
+
+
+	@Override
+	public void tearDown() throws Exception {
+		solo.finishOpenedActivities();
+	}
+
+	public void testHistoryName() {
+		try {
+			Report.setTCNameLog(testName);
+//			Action.alertCancleButton(solo);
+			Action.init(solo);
+			flag=Action.wait(solo, R.id.title, count, "房源列表");
+			if(flag==false){
+				 return;
+			 }
+			Action.clickById(solo, R.id.title, "房源列表第一套房源");
+			Action.wait(solo, R.id.prop_title, count, "房源详情");
+			String propTitle = (String) ((TextView) solo.getCurrentActivity()
+					.findViewById(R.id.prop_title)).getText();
+			Report.writeHTMLLog("获取房源列表第一套房源名字", "房源列表第一套房源名字：" + propTitle,
+					"DONE", Action.screenShot(solo));
+			Action.wait(solo, R.id.btfavorite, count, "收藏");
+			if(((TextView)solo.getView(R.id.btfavorite)).getText().equals("取消收藏")){
+				Action.clickById(solo, R.id.btfavorite, "取消收藏");
+			}
+			Action.clickById(solo, R.id.btfavorite, "收藏");
+			Action.goHomePage(solo);
+			Action.clickById(solo, R.id.to_main_button, "菜单");
+			Action.clickById(solo, R.id.activity_main_menu_tv_favorites, "我的收藏");
+			flag=Action.wait(solo, R.id.title, count, "我的收藏列表");
+			if(flag==false){
+				 return;
+			 }
+			Action.clickById(solo, R.id.title, "我的收藏列表第一套房源");
+			Action.wait(solo, R.id.prop_title, count, "我的收藏列表第一套房源标题");
+			String myFavPropTitle = (String) ((TextView) solo
+					.getCurrentActivity().findViewById(R.id.prop_title))
+					.getText();
+			Report.writeHTMLLog("获取我的列表第一套房源名字", "我的收藏列表第一套房源名字："
+					+ myFavPropTitle, "DONE", Action.screenShot(solo));
+			Action.assertString(solo, "房源列表第一套房源名字与最我的收藏列表第一套名字", propTitle,
+					myFavPropTitle);
+			Action.goHomePage(solo);
+			Report.seleniumReport();
+		} catch (Exception e) {
+			Report.writeHTMLLog("出现不可知异常:" + e.getMessage(), "脚本停止", "WARNING",
+					imag);
+			Report.seleniumReport();
+		}
+
+	}
+
+
+}

@@ -1,0 +1,123 @@
+package com.anjuke.android.haozu.test;
+
+import java.util.ArrayList;
+
+import com.anjuke.android.haozu.R;
+import com.anjuke.android.haozu.activity.WelcomeActivity;
+import com.anjuke.android.haozu.function.Action;
+import com.anjuke.android.haozu.v2.view.tablebar.TabBarItemView;
+import com.anjuke.android.util.Report;
+import com.jayway.android.robotium.solo.Solo;
+import static junit.framework.Assert.*;
+import android.test.ActivityInstrumentationTestCase2;
+import android.text.style.ClickableSpan;
+import android.view.View;
+import android.widget.ListView;
+import android.widget.TextView;
+
+/*
+ * @author:William
+ * 测试用例步骤简介：
+ * #1.附近页设置完找房筛选条件
+ * #2.切换到搜索页
+ * #3.点击筛选按钮，检查当前筛选条件是否与一开始设置的 一样，预期应该是是不一致
+ * @CreateDate: 2012/05/28
+ */
+
+
+public class SearchFilterTest3 extends ActivityInstrumentationTestCase2<WelcomeActivity> {
+	private Solo solo;
+	private int count = 3;
+	private String testName = "好租V2.2搜索页筛选条件测试用例3";
+   
+	public SearchFilterTest3(){
+		super("com.anjuke.haozu",WelcomeActivity.class);
+	}
+	
+	@Override
+	public void setUp() throws Exception{
+		solo = new Solo(getInstrumentation(),getActivity());
+	}
+	
+	@Override
+	public void tearDown() throws Exception{
+		solo.finishOpenedActivities();
+	}
+	
+	public void testSearchConditionFilter(){
+		try {
+			Report.setTCNameLog(testName);	
+			
+			//先到”搜索“栏清空筛选条件
+			solo.clickOnText("搜索");
+//			//点击切换城市按钮
+			solo.clickOnButton("切换城市");
+			solo.clickOnText("上海");
+			solo.waitForText("切换城市");
+			
+			
+			//点击历史记录中的第一条
+			solo.clickOnView(solo.getView(R.id.item));
+			
+			solo.clickOnText("筛选")	;
+			//点击重置按钮
+			solo.clickOnButton("重置");
+			//点击确定按钮
+			solo.clickOnButton("确定");		
+
+			solo.waitForView(solo.getView(R.id.title));
+			System.out.println("搜索页面成功显示房源列表信息---->");
+			
+			//再切换到“附近”栏		
+			solo.clickOnButton("返回");
+//			solo.clickOnText("我的");
+			solo.clickOnText("附近");
+
+			
+			solo.waitForText("地图");
+			System.out.println("切换至附近页面---->");
+			//再点击”筛选“按钮
+			solo.clickOnText("筛选");	
+			solo.clickOnText("重置");
+ 
+			//设置筛选找房条件
+			Action.selectFilterCondition(solo, 5, 2, 2, 3);
+			
+			 //点击“搜索”按钮
+//			solo.clickOnText("我的");//直接点'搜索'点不到所有先点”我的“
+			solo.clickOnText("搜索");			
+			
+			//选择”按区域板块”搜索
+			solo.clickOnText("按区域板块");		
+			solo.waitForText("返回");
+
+			//选中浦东->金桥
+			solo.clickOnText("浦东");
+			solo.clickOnText("金桥");
+			
+			//等待回到主页面
+			solo.waitForActivity("MainPageActivity", 3000);
+			//再次点击筛选按钮
+			solo.clickOnView(solo.getView(R.id.activity22_search_list_btn_filter));				
+			
+			//检查当前显示的筛选条件是否与上次的一致
+			Boolean flag = Action.checkFilterCondition(solo, 5, 2, 2, 3);
+			if(!flag){
+			Report.writeHTMLLog("好租搜索页筛选条件测试用例3", "筛选条件匹配不成功，是预期结果,用例顺利执行---->", Report.PASS, "");				
+			}else{
+				String ps = Action.screenShot(solo);
+				Report.writeHTMLLog("好租搜索页筛选条件测试用例3", "筛选条件匹配成功，不是预期结果,用例执行失败---->", Report.FAIL, ps);				
+			    fail("用例执行失败---->");
+			}
+			Report.seleniumReport();
+		} catch (Exception e) {
+			String ps = Action.screenShot(solo);
+			Report.writeHTMLLog("出现异常:"+ e.getMessage(), "脚本停止", Report.FAIL, ps);
+			Report.seleniumReport();
+		}
+	}
+
+}	
+
+	
+

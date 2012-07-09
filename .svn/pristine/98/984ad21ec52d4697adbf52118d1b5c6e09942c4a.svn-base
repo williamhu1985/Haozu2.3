@@ -1,0 +1,97 @@
+package com.anjuke.android.haozu.test;
+
+import android.test.ActivityInstrumentationTestCase2;
+import android.widget.TextView;
+
+import com.anjuke.android.haozu.R;
+import com.anjuke.android.haozu.activity.WelcomeActivity;
+import com.anjuke.android.haozu.function.Action;
+import com.anjuke.android.util.Report;
+import com.jayway.android.robotium.solo.Solo;
+
+public class FiltersTest extends ActivityInstrumentationTestCase2<WelcomeActivity>{
+	private Solo solo;
+	private  int count = 3;
+	private String testName = "好租筛选条件与选手结果标题检查";
+    private String bureau = "浦东";
+    private String area = "金桥";
+    private String metroLine = "6号线";
+    private String metroStation = "世纪大道";
+    private String searchTip = "";
+    
+	public FiltersTest(){
+		super("com.anjuke.haozu",WelcomeActivity.class);		
+	}
+
+	@Override
+	public void setUp(){
+		solo = new Solo(getInstrumentation(),getActivity());
+	}
+
+	@Override
+	public void tearDown(){
+		solo.finishOpenedActivities();
+	}
+
+	public void testFilters(){
+		Report.setTCNameLog(testName);
+
+		//case1:搜索页按选择区域搜索
+		//点击“搜索”View
+		solo.clickOnText("搜索");
+
+		//点击切换城市按钮  
+		solo.clickOnButton("切换城市");
+
+		solo.clickOnText("上海");
+
+		//选择”按区域板块”搜索 
+		solo.clickOnText("按区域板块");
+
+		Action.wait(solo,R.id.activity_select_city2_back,count, "等待区域页面显示");
+		//选中浦东->金桥 
+		solo.clickOnText(bureau);
+		solo.clickOnText(area);
+		
+		//获取搜索栏信息
+		searchTip =  (String)((TextView)solo.getView(R.id.activity22_search_list_searchtip)).getText();
+		Action.assertFilter(solo, "筛选条件和筛选信息栏",searchTip,bureau,area);
+       System.out.println("第一个case执行完毕--->");
+		
+		//Case2:搜索页输入关键字		
+		//点击搜索按钮
+		
+		solo.clickOnText("搜索");
+		solo.clickOnView(solo.getView(R.id.activity_search_address_et));
+		solo.enterText(0, bureau.concat(area));
+
+		solo.clickOnButton(0);		
+		
+//		solo.clickOnText("")
+//		
+//		//等待筛选页面显示成功
+//		Action.wait(solo, R.id.activity22_search_list_btn_filter,count, "等待筛选页面显示成功");
+//				
+		//获取搜索栏信息
+		searchTip =  (String)((TextView)solo.getView(R.id.activity22_search_list_searchtip)).getText();
+		Action.assertFilter(solo, "筛选条件和筛选信息栏",searchTip,bureau.concat(area));
+		System.out.println("第二个case执行完毕--->");
+		
+		//case3:搜索页按地铁站点搜索
+		//点击搜索按钮
+		solo.clickOnText("搜索");				
+
+
+		//选择”按区域板块”搜索
+		solo.clickOnText("按地铁站点");
+		
+		Action.wait(solo,R.id.activity_select_city2_back,count, "等待区域页面显示");		
+		solo.clickOnText(metroLine);
+		solo.clickOnText(metroStation);
+		
+		//获取搜索栏信息
+		searchTip =  (String)((TextView)solo.getView(R.id.activity22_search_list_searchtip)).getText();
+		Action.assertFilter(solo, "筛选条件和筛选信息栏",searchTip,metroLine,metroStation);
+		System.out.println("第三个case执行完毕--->");
+	}
+}

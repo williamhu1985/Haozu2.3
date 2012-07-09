@@ -1,0 +1,130 @@
+package com.anjuke.android.haozu.test;
+
+
+import com.anjuke.android.haozu.activity.WelcomeActivity;
+import com.anjuke.android.haozu.function.Action;
+import com.jayway.android.robotium.solo.Solo;
+import com.anjuke.android.haozu.R;
+import com.anjuke.android.util.Report;
+
+import android.os.Handler;
+import android.os.Message;
+import android.test.ActivityInstrumentationTestCase2;
+import android.widget.TextView;
+
+public class HistoryTitleTest extends
+		ActivityInstrumentationTestCase2<WelcomeActivity> {
+	private Solo solo;
+	private String imag = "";
+	private int count = 3;
+	private boolean flag = false;
+	private String testName = "好租房源列表第一套房源与最近浏览列表第一套房源比较";
+	private static String name="";
+	private int shot=0;
+
+	public HistoryTitleTest() {
+		super("com.anjuke.haozu", WelcomeActivity.class);
+	}
+
+	public void setUp() throws Exception {
+		solo = new Solo(getInstrumentation(), getActivity());
+	}
+	
+	@Override
+	public void tearDown() throws Exception {
+		solo.finishOpenedActivities();
+	}
+
+	public void testHistoryName() {
+
+		try {
+	
+
+			Report.setTCNameLog(testName);
+//			Action.alertCancleButton(solo);
+
+
+//			solo.clickOnView(solo.getView(R.id.title));
+
+//			solo.clickInList(1);
+			Thread.sleep(5000);
+			Action.init(solo);
+			solo.waitForActivity("ListActivityV2");
+			flag=Action.wait(solo, R.id.title, count, "房源列表");
+			 if(flag==false){
+				 return;
+			 }
+			
+			
+			Action.clickById(solo, R.id.title, "房源列表第一套房源");
+			
+//			solo.waitForActivity("DetailActivityForPicture");
+			
+			Action.wait(solo, R.id.prop_title, count, "房源详情");
+
+			String propTitle = (String) ((TextView)solo.getView(R.id.prop_title)).getText();
+//			thread.start();
+		
+			name=Action.screenShot(solo);
+			Report.writeHTMLLog("获取房源列表第一套房源名字", "房源列表第一套房源名字：" + propTitle,
+					"DONE", name);
+			Action.goHomePage(solo);
+			Action.clickById(solo, R.id.to_main_button, "菜单");
+			Action.clickById(solo, R.id.activity_main_menu_tv_history, "浏览历史");
+//			flag=Action.wait(solo, R.id.house_title, count, "最近浏览列表");
+			if(flag==false){
+				 return;
+			 }
+//			Action.clickById(solo, R.id.house_title, "最近浏览列表第一套房源");
+			Action.wait(solo, R.id.prop_title, count, "最近浏览列表第一套房源标题");
+		
+
+			String historyPropTitle = (String) ((TextView)solo.getView(R.id.prop_title)).getText();
+			name=Action.screenShot(solo);
+		
+			Report.writeHTMLLog("获取最近浏览列表第一套房源名字", "最近浏览列表第一套房源名字："
+					+ historyPropTitle, "DONE", name);
+			Action.assertString(solo, "房源列表第一套房源名字与最近浏览列表第一套名字", propTitle,
+					historyPropTitle);
+			Action.goHomePage(solo);
+			Report.seleniumReport();
+		} catch (Exception e) {
+			Report.writeHTMLLog("出现不可知异常:" + e.getMessage(), "脚本停止", "WARNING",
+					imag);
+			Report.seleniumReport();
+		}
+
+	}
+	
+//	Handler handler =new Handler(){
+//		public void handleMessage(Message msg){
+//			name=Action.screenShot(solo);
+//			switch(msg.what){
+//			case 1:
+//				
+//				Report.writeHTMLLog("获取房源列表第一套房源名字", "房源列表第一套房源名字：",
+//						"DONE", name);
+//			break;
+//			case 2:
+//				Report.writeHTMLLog("获取最近浏览列表第一套房源名字", "最近浏览列表第一套房源名字："
+//						, "DONE", name);
+//				break;
+//			default:
+//				break;
+//		}
+//	};
+//	};
+//	Thread thread =new Thread(){
+//		public void run(){
+//			if(shot==1){
+//				handler.sendEmptyMessage(1);
+//				shot++;
+//			}
+//			else{
+//				handler.sendEmptyMessage(2);
+//			}
+//		}
+//	};
+
+	
+}

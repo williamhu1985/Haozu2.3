@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="gen"/>
+	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
+	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="libs/ddmlib.jar"/>
+	<classpathentry kind="lib" path="libs/robotium-solo-3.1.jar" sourcepath="libs/robotium-solo-3.1-sources.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/Android-HaozuV2.21"/>
+	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
+	<classpathentry kind="lib" path="E:/selenium2/lib/mail.jar"/>
+	<classpathentry kind="output" path="bin/classes"/>
+</classpath>

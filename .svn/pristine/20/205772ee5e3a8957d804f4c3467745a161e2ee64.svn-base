@@ -1,0 +1,31 @@
+package com.anjuke.android.haozu.test;
+
+import java.util.ArrayList;
+
+import com.anjuke.android.haozu.R;
+import com.anjuke.android.haozu.activity.WelcomeActivity;
+import com.anjuke.android.haozu.function.Action;
+import com.anjuke.android.util.Report;
+import com.jayway.android.robotium.solo.Solo;
+
+import android.test.ActivityInstrumentationTestCase2;
+import android.view.View;
+import android.widget.ListView;
+import android.widget.TextView;
+
+
+
+public class AndroidTest extends ActivityInstrumentationTestCase2<WelcomeActivity> {
+    private Solo solo;
+    
+	public AndroidTest(){
+		super("com.anjuke.haozu",WelcomeActivity.class);
+	}
+	
+	@Override
+	public void setUp() throws Exception{
+		solo = new Solo(getInstrumentation(),getActivity());
+	}
+
+
+}
